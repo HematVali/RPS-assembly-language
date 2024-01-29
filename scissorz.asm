@@ -1,58 +1,77 @@
 .data
-draw_message DB 'This game is a draw$'
-user_win DB 'Congratulations you have won$'
-draw_message DB 'I am sorry you have lost$'
+draw_message:   .asciiz "This game is a draw"
+user_win_message:       .asciiz "Congratulations, you have won"
+lose_message:   .asciiz "I am sorry, you have lost"
 
-.code
+.text
 
 main:
+
     li  $a0, 1
     li  $a1, 2
 
-    move	$k0, $a0
-    move	$k1, $a1  
 
-    sub    $k3, $k0 ,$k1
+    move    $t0, $a0
+    move    $t1, $a1   
 
-    blt    $k3, 0, abs
+    sub     $t2, $t0, $t1
 
-    beq    $k3, 0, draw 
+    li     $t7, 0
+    blt    $t2, $t7, absoluteVal
 
-    beq    $k3, 2, rock_scissor
+end:
+    li $t7 0
+    beq    $t2, $t7, draw 
 
-    beq    $k3, 1, draw
+    li     $t7, 2
+    beq    $t2, $t7, rock_scissor
+
+    li     $t7, 1
+    beq    $t2, $t7, draw
 
     j      wrong_input
 
-abs:
-    mult    $k3, -1
-    mflo    $k3
-    j       main_end
+absoluteVal:
+
+    li   $t7, -1
+    mult $t2, $t7
+    mflo $t2
+
+    j       end
 
 draw:
-    la     $v0, 0
+    li $t6 100
+    li     $v0, 10
+    syscall
 
-    j       final
 
 rock_scissor:
-    beq    $k0, 0, user_win
+
+    beq    $t0, 0, user_win
     j      cpu_win
 
 paper_chosen:
-    beq    $k0, 0, cpu_win
-    beq    $k0, 2, user_win
-    beq    $k1, 0, user_win
+
+    beq    $t0, 0, cpu_win
+    beq    $t0, 2, user_win
+    beq    $t1, 0, user_win
     j      cpu_win
 
 user_win:
-    la     $v0, 1
-    j      final
+    li $t6 1
+    li $v0 10
+    syscall
+    
 
 cpu_win:
-    la     $v0, -1
-    j      final
+    li $t6 -1
+    li $v0 10
+    syscall
 
 final:
-
+    li $v0 10
+    syscall
 
 wrong_input:
+    li $v0 10
+    syscall
